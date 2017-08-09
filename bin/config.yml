@@ -1,0 +1,58 @@
+# Cartographer config - Created by BananaPuncher714
+# Only permission is cartographer.admin
+# It allows you to set the map center and update it.
+# The only commands are /setmapcenter and /mapreload
+# The map will automagically save and reload itself whenever the server restarts.
+# The map will also automagically adjust the zoom so you can't zoom too far out if the map itself is smaller.
+
+# Do NOT make the height or width smaller than 128!!
+map-height: 1538
+map-width: 1538
+
+# The loading speed really depends on how large the map is. Anything below 16 will cause lag
+# and 16 is already pretty fast and slightly laggy. For maps larger than 12048, use 32 or 64 or something higher.
+map-load-speed: 16
+
+# This is whether the center of the map will be in the center of a chunk or your exact position
+center-chunk: true
+
+# The DEFAULT color if there is no color for a material or if it's over the void
+default-color: "255, 0, 255"
+
+# This is how dark the water can get based on this formula: ( depth * shade ) / 100
+# The result is a percent that is used to darken the color water.
+# Of course, this also depends on the rgb value of the water color, but
+# too small a value will not show up on the map, and too high will completely dark out deep areas.
+water-shading: 100
+
+# This option is whether or not this plugin will use the "default renderer"
+# Rather, it gets the highest non-transparent block, or the highest block that blocks light.
+# Using this is simpler, as it can hide tall grass, flowers, and other junk, but
+# may also hide blocks like pistons, rails, chests, and other random blocks.
+default-render: true
+
+# The order it goes in is the material name, the data value, and the RGB color value.
+# It SHOULD accept ids too.
+# Find the materials online here at https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+# The default colors can be found here: https://minecraft.gamepedia.com/Map_item_format#Color_table
+map-colors:
+    GRASS,-1: "127, 178, 56"
+    WATER,-1: "64, 64, 255"
+    STATIONARY_WATER,-1: "64, 64, 255"
+    LEAVES,-1: "0, 124, 0"
+    LEAVES_2,-1: "0, 124, 0"
+    WOOD,0: "143, 119, 72"
+    WOOD_STEP,0: "143, 119, 72"
+    WOOD_STEP,8: "143, 119, 72"
+    WOOD_DOUBLE_STEP,0: "143, 119, 72"
+    WOOD_STAIRS,-1: "143, 119, 72"
+    DIRT,-1: "151, 109, 77"
+    STONE,0: "112, 112, 112"
+    STONE,3: "255, 252, 245"
+    STONE,4: "255, 252, 245"
+    STONE,5: "112, 112, 112"
+    STONE,6: "112, 112, 112"
+    HARD_CLAY,-1: "216, 127, 51"
+    SAND,0: "247, 233, 163"
+    SAND,1: "216, 127, 51"
+    OBSIDIAN,-1: "25, 25, 25"

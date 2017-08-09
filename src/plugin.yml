@@ -1,0 +1,9 @@
+name: Cartographer
+main: io.github.bananapuncher714.CartographerMain
+version: 3.0
+author: BananaPuncher714
+commands:
+    setmapcenter:
+        description: Centers the map
+    mapreload:
+        description: Reloads the map
