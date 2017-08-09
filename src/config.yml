@@ -38,8 +38,8 @@ transparent-blocks:
 
 # Here are extra presets that will get loaded in order after loading the default config colors.
 # Place them inside the presets folder.
-presets: []
-#- example.yml
+presets:
+- example.yml
 
 # The order it goes in is the material name, the data value, and the RGB color value.
 # It SHOULD accept ids too.

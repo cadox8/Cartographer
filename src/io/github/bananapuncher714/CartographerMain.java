@@ -142,13 +142,15 @@ public class CartographerMain extends JavaPlugin implements Listener {
 				continue;
 			}
 			FileConfiguration cc = YamlConfiguration.loadConfiguration( colorConfig );
-			loadTransparentBlocks( cc, false );
-			getLogger().info( "Loaded the transpart blocks of preset '" + name + "' successfully!" );
+			if ( loadTransparentBlocks( cc, false ) ) {
+				getLogger().info( "Loaded the transparent blocks of preset '" + name + "' successfully!" );
+			}
 		}
 	}
 	
-	public void loadTransparentBlocks( FileConfiguration c, boolean clear ) {
+	public boolean loadTransparentBlocks( FileConfiguration c, boolean clear ) {
 		if ( clear ) skipBlocks.clear();
+		if ( !c.contains( "transparent-blocks" ) ) return false;
 		for ( String s : c.getStringList( "transparent-blocks" ) ) {
 			String sf = s;
 			boolean negate = false;
@@ -173,6 +175,7 @@ public class CartographerMain extends JavaPlugin implements Listener {
 				skipBlocks.add( mat );
 			}
 		}
+		return true;
 	}
 	
 	public void loadAllColors( boolean clear ) {
@@ -185,18 +188,21 @@ public class CartographerMain extends JavaPlugin implements Listener {
 				continue;
 			}
 			FileConfiguration cc = YamlConfiguration.loadConfiguration( colorConfig );
-			loadColors( cc, false );
-			getLogger().info( "Loaded the colors of preset '" + name + "' successfully!" );
+			if ( loadColors( cc, false ) ) {
+				getLogger().info( "Loaded the colors of preset '" + name + "' successfully!" );
+			}
 		}
 	}
 	
-	public void loadColors( FileConfiguration c, boolean clear ) {
+	public boolean loadColors( FileConfiguration c, boolean clear ) {
 		if ( clear ) mapColors.clear();
+		if ( c.getConfigurationSection( "map-colors" ) == null ) return false;
 		for (String s : c.getConfigurationSection( "map-colors" ).getKeys( false ) ) {
 			String[] split = c.getString( "map-colors." + s ).split( "\\D+" );
 			String[] matSplit = s.split( "," );
 			loadColor( matSplit, split );
 		}
+		return true;
 	}
 	
 	public void loadColor( Material m, byte data, Color c ) {
