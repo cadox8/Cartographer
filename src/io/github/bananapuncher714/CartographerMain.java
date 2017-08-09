@@ -3,6 +3,7 @@ package io.github.bananapuncher714;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -36,6 +37,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class CartographerMain extends JavaPlugin implements Listener {
 	HashMap< Material, HashMap< Byte, Color > > mapColors = new HashMap< Material, HashMap< Byte, Color > >();
+	ArrayList< String > colorfiles = new ArrayList< String >();
+	HashSet< Material > skipBlocks = new HashSet< Material >();
 	private int x = 0, y = 0, waters;
 	private byte[][] map = new byte[ 1024 ][ 1024 ];
 	private boolean done = true;
@@ -70,8 +73,8 @@ public class CartographerMain extends JavaPlugin implements Listener {
 								b = w.getHighestBlockAt( mainl.getBlockX(), mainl.getBlockZ() ).getLocation().clone().subtract( 0, 1, 0 ).getBlock();
 								abovey = w.getHighestBlockYAt( mainl.getBlockX(), mainl.getBlockZ() - 1 ) - 1;
 							} else {
-								b = Util.getHighestBlockAt( mainl );
-								abovey = Util.getHighestBlockAt( mainl.clone().subtract( 0, 0, 1 ) ).getY();
+								b = Util.getHighestBlockAt( mainl, skipBlocks );
+								abovey = Util.getHighestBlockAt( mainl.clone().subtract( 0, 0, 1 ), skipBlocks ).getY();
 							}
 							Material mat = b.getType();
 							byte data = b.getData();
@@ -120,11 +123,71 @@ public class CartographerMain extends JavaPlugin implements Listener {
 		centerChunk = c.getBoolean( "center-chunk" );
 		waters = c.getInt( "water-shading" );
 		defrend = c.getBoolean( "default-render" );
+		colorfiles = new ArrayList< String >( c.getStringList( "presets" ) );
 		int height = c.getInt( "map-height" );
 		int width = c.getInt( "map-width" );
 		map = new byte[ width ][ height ];
-		loadColors( getConfig(), true );
+		loadAllColors( true );
+		loadAllTransparentBlocks( true );
 		loadData();
+	}
+	
+	public void loadAllTransparentBlocks( boolean clear ) {
+		loadTransparentBlocks( getConfig(), clear );
+		new File( getDataFolder() + File.separator + "presets" + File.separator ).mkdirs();
+		for ( String name : colorfiles ) {
+			File colorConfig = new File( getDataFolder() + File.separator + "presets" + File.separator + name );
+			if ( !colorConfig.exists() ) {
+				getLogger().warning( "preset '" + name + "' does not exist! Some blocks may not appear properly!" );
+				continue;
+			}
+			FileConfiguration cc = YamlConfiguration.loadConfiguration( colorConfig );
+			loadTransparentBlocks( cc, false );
+			getLogger().info( "Loaded the transpart blocks of preset '" + name + "' successfully!" );
+		}
+	}
+	
+	public void loadTransparentBlocks( FileConfiguration c, boolean clear ) {
+		if ( clear ) skipBlocks.clear();
+		for ( String s : c.getStringList( "transparent-blocks" ) ) {
+			String sf = s;
+			boolean negate = false;
+			if ( s.startsWith( "-" ) ) {
+				sf = s.substring( 1 );
+				negate = true;
+			}
+			Material mat;
+			try {
+				mat = Material.getMaterial( Integer.parseInt( sf ) );
+			} catch ( Exception e ) {
+				try {
+					mat = Material.getMaterial( sf );
+				} catch ( Exception e2 ) {
+					getLogger().warning( sf + " does not exist! Older version of Minecraft, perhaps?" );
+					continue;
+				}
+			}
+			if ( negate ) {
+				if ( skipBlocks.contains( mat ) ) skipBlocks.remove( mat );
+			} else {
+				skipBlocks.add( mat );
+			}
+		}
+	}
+	
+	public void loadAllColors( boolean clear ) {
+		loadColors( getConfig(), clear );
+		new File( getDataFolder() + File.separator + "presets" + File.separator ).mkdirs();
+		for ( String name : colorfiles ) {
+			File colorConfig = new File( getDataFolder() + File.separator + "presets" + File.separator + name );
+			if ( !colorConfig.exists() ) {
+				getLogger().warning( "preset '" + name + "' does not exist! Some colors may be missing!" );
+				continue;
+			}
+			FileConfiguration cc = YamlConfiguration.loadConfiguration( colorConfig );
+			loadColors( cc, false );
+			getLogger().info( "Loaded the colors of preset '" + name + "' successfully!" );
+		}
 	}
 	
 	public void loadColors( FileConfiguration c, boolean clear ) {
@@ -132,26 +195,39 @@ public class CartographerMain extends JavaPlugin implements Listener {
 		for (String s : c.getConfigurationSection( "map-colors" ).getKeys( false ) ) {
 			String[] split = c.getString( "map-colors." + s ).split( "\\D+" );
 			String[] matSplit = s.split( "," );
-			Material mat = Material.AIR;
-			boolean skip = false;
-			try {
-				mat = Material.getMaterial( Integer.parseInt( matSplit[ 0 ] ) );
-			} catch ( Exception e ) {
-				try {
-					mat = Material.getMaterial( matSplit[ 0 ] );
-				} catch ( Exception e2 ) {
-					getLogger().warning( matSplit[ 0 ] + " does not exist! Older version of Minecraft, perhaps?" );
-					skip = true;
-				}
-			}
-			if ( skip ) continue;
-			HashMap< Byte, Color > tempMap = ( HashMap< Byte, Color > ) mapColors.get( mat );
-			if ( tempMap == null ) {
-				tempMap = new HashMap<Byte, Color>();
-				mapColors.put( mat, tempMap );
-			}
-			tempMap.put( Byte.parseByte( matSplit[ 1 ] ), new Color(Integer.parseInt(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2])));
+			loadColor( matSplit, split );
 		}
+	}
+	
+	public void loadColor( Material m, byte data, Color c ) {
+		Material mat = m;
+		HashMap< Byte, Color > tempMap = ( HashMap< Byte, Color > ) mapColors.get( mat );
+		if ( tempMap == null ) {
+			tempMap = new HashMap<Byte, Color>();
+			mapColors.put( mat, tempMap );
+		}
+		tempMap.put( data , c );
+		return;
+	}
+	
+	public void loadColor( Material m, byte data, int r, int g, int b ) {
+		loadColor( m, data, new Color( r, g, b ) );
+	}
+	
+	private boolean loadColor( String[] md, String[] rgb ) {
+		Material mat = Material.AIR;
+		try {
+			mat = Material.getMaterial( Integer.parseInt( md[ 0 ] ) );
+		} catch ( Exception e ) {
+			try {
+				mat = Material.getMaterial( md[ 0 ] );
+			} catch ( Exception e2 ) {
+				getLogger().warning( md[ 0 ] + " does not exist! Older version of Minecraft, perhaps?" );
+				return false;
+			}
+		}
+		loadColor( mat, Byte.parseByte( md[ 1 ] ), new Color( Integer.parseInt( rgb[ 0 ] ), Integer.parseInt( rgb[ 1 ] ), Integer.parseInt( rgb[ 2 ] ) ) );
+		return true;
 	}
 	
 	@Override
@@ -180,7 +256,8 @@ public class CartographerMain extends JavaPlugin implements Listener {
 			for ( Player pl : Bukkit.getOnlinePlayers() ) {
 				if ( pl.hasPermission( "cartographer.admin" ) ) pl.sendMessage( ChatColor.AQUA + "Reloading map..." );
 			}
-			loadColors( getConfig(), false );
+			loadAllColors( false );
+			loadAllTransparentBlocks( false );
 			done = false;
 		}
 		return false;
@@ -242,8 +319,8 @@ public class CartographerMain extends JavaPlugin implements Listener {
 				b = w.getHighestBlockAt( l.getBlockX(), l.getBlockZ() ).getLocation().clone().subtract( 0, 1, 0 ).getBlock();
 				abovey = w.getHighestBlockYAt( l.getBlockX(), l.getBlockZ() - 1 ) - 1;
 			} else {
-				b = Util.getHighestBlockAt( l );
-				abovey = Util.getHighestBlockAt( l.clone().subtract( 0, 0, 1 ) ).getY();
+				b = Util.getHighestBlockAt( l, skipBlocks );
+				abovey = Util.getHighestBlockAt( l.clone().subtract( 0, 0, 1 ), skipBlocks ).getY();
 			}
 			Material mat = b.getType();
 			byte data = b.getData();
