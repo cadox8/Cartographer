@@ -1,6 +1,13 @@
 package io.github.bananapuncher714.map;
 
 import io.github.bananapuncher714.CartographerMain;
+import io.github.bananapuncher714.MapManager;
+import io.github.bananapuncher714.MapManager.CursorSelector;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapCursor;
@@ -13,8 +20,11 @@ public class CustomRenderer extends MapRenderer {
 	CartographerMain plugin;
 	int size = 2, borderx, bordery;
 	int stage = 0, stage2 = 0;
+	boolean showPlayer = true;
+	HashSet< CursorSelector > selectors = new HashSet< CursorSelector >();
+	MapCursor.Type defPointer;
 	
-	public CustomRenderer( boolean contextual, CartographerMain p, Scale s ) {
+	public CustomRenderer( boolean contextual, CartographerMain p, Scale s, boolean showPlayer, MapCursor.Type defPointer ) {
 		super( contextual );
 		// Here the amount of blocks( size ) is determined on the scale
 		if ( s.equals( Scale.CLOSEST ) ) size = 1;
@@ -29,6 +39,8 @@ public class CustomRenderer extends MapRenderer {
 		 * so a map with a border of 1024 cannot be shifted when the scale is 'far'
 		*/
 		plugin = p;
+		this.showPlayer = showPlayer;
+		this.defPointer = defPointer;
 		borderx = ( ( plugin.getXLength() - size * 128 ) / 2 );
 		bordery = ( ( plugin.getYLength() - size * 128 ) / 2 );
 	}
@@ -83,6 +95,8 @@ public class CustomRenderer extends MapRenderer {
 					}
 				}
 			}
+		} else {
+			return;
 		}
 		// Now it's time to draw the player icon and the rest of the icons we want
 		// But first, we have to compute the amount of icons
@@ -93,49 +107,39 @@ public class CustomRenderer extends MapRenderer {
 		if ( xo < 0 ) ax = -ax;
 		if ( zo < 0 ) ab = -ab;
 		MapCursorCollection mcc = arg1.getCursors();
-		int cursorListSize = 1;
-		/*
-		PlayerWrapper wrapper = plugin.getPlayerWrapper( arg2 );
-		if ( wrapper == null ) return;
-		Clan c = wrapper.getClan();
 		
-		
-		if ( c != null ) {
-			if ( c.getHome() != null ) cursorListSize++;
-			for ( UUID u : c.getMembers() ) {
-				Player offp = Bukkit.getOfflinePlayer( u ).getPlayer();
-				if ( offp != null && offp != arg2 ) cursorListSize++;
-			}
+		HashMap< String, CursorSelector > cursorMap = MapManager.getCursorSelectors();
+		for ( String permission : cursorMap.keySet() ) {
+			if ( arg2.hasPermission( permission ) ) selectors.add( cursorMap.get( permission ) );
 		}
-		*/
-		while ( mcc.size() < cursorListSize ) mcc.addCursor( new MapCursor( ( byte ) 0, ( byte ) 0, ( byte ) 0, ( byte ) 0, true ) );
-		while ( mcc.size() > cursorListSize ) mcc.removeCursor( mcc.getCursor( 0 ) );
-		MapCursor cursor2;
-		int playerIndex = 0;
-		Player p;
+		
+		ArrayList< RealWorldCursor > cursors = new ArrayList< RealWorldCursor >();
+		if ( showPlayer ) cursors.add( new RealWorldCursor( arg2.getLocation(), defPointer ) );
+		for ( CursorSelector cs : selectors ) {
+			cursors.addAll( cs.getCursors( arg2 ) );
+		}
+
+		while ( mcc.size() < cursors.size() ) mcc.addCursor( new MapCursor( ( byte ) 0, ( byte ) 0, ( byte ) 0, ( byte ) 0, true ) );
+		while ( mcc.size() > cursors.size() ) mcc.removeCursor( mcc.getCursor( 0 ) );
+		MapCursor cursor;
 		// Here we actually start drawing it
 		for ( int i = 0; i < mcc.size(); i++ ) {
-			cursor2 = mcc.getCursor( i );
-			if ( i == 0 ) {
-				centerPlayerCursor( cursor2, overlapx, overlapy, ax, ab, arg2 );
-			}/* else if ( i == 1 && c.getHome() != null ) {
-				cursor2.setRawType( ( byte ) 4 );
-				int bedx = c.getHome().getBlockX();
-				int bedy = c.getHome().getBlockZ();
-				int[] bedCoord = findRelPosition( mapcenterx, mapcentery, bedx, bedy );
-				cursor2.setX( ( byte ) bedCoord[ 0 ] );
-				cursor2.setY( ( byte ) bedCoord[ 1 ] );
+			cursor = mcc.getCursor( i );
+			if ( i == 0 && showPlayer ) {
+				centerPlayerCursor( cursor, overlapx, overlapy, ax, ab, arg2 );
 			} else {
-				p = null;
-				cursor2.setRawType( ( byte ) 1 );
-				while ( p == null || p == arg2 ) p = Bukkit.getOfflinePlayer( c.getMembers().get( playerIndex++ ) ).getPlayer();
-				int bedx = p.getLocation().getBlockX();
-				int bedy = p.getLocation().getBlockZ();
-				int[] bedCoord = findRelPosition( mapcenterx, mapcentery, bedx, bedy );
-				cursor2.setX( ( byte ) bedCoord[ 0 ] );
-				cursor2.setY( ( byte ) bedCoord[ 1 ] );
-				cursor2.setDirection( ( byte ) ( ( Math.abs( ( p.getLocation().getYaw() + 360.0 ) / 22.5 ) - 1 ) % 15 ) );
-			}*/
+				RealWorldCursor rwc = cursors.get( i );
+				cursor.setType( rwc.getType() );
+				int cursorX = rwc.getLocation().getBlockX();
+				int cursorY = rwc.getLocation().getBlockZ();
+				// ohhh am I SO glad that I didn't remove mapcenterx and mapcentery or else I
+				// would have had to redo all that code...
+				// Although, it wouldn't be too bad because I do have a backup.
+				int[] dispLoc = findRelPosition( mapcenterx, mapcentery, cursorX, cursorY );
+				cursor.setX( ( byte ) dispLoc[ 0 ] );
+				cursor.setY( ( byte ) dispLoc[ 1 ] );
+				cursor.setDirection( ( byte ) ( ( Math.abs( ( rwc.getLocation().getYaw() + 360.0 ) / 22.5 ) - 1 ) % 15 ) );
+			}
 		}
 	}
 	
@@ -155,7 +159,8 @@ public class CustomRenderer extends MapRenderer {
 	public void centerPlayerCursor( MapCursor cursor, boolean overlapx, boolean overlapy, int ax, int ab, Player arg2 ) {
 		// This one here centers the player
 		// Only supposed to be called once on the actual player viewing the map
-		cursor.setRawType( ( byte ) 0 );
+//		cursor.setRawType( ( byte ) 0 );
+		cursor.setType( defPointer );
 		if ( overlapx ) cursor.setX( ( byte ) 0 );
 		else if ( ax <= 128 && ax >= -128 ) cursor.setX( ( byte ) ax );
 		else if ( ax < -128 ) cursor.setX( ( byte ) -128 );

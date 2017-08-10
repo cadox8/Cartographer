@@ -31,6 +31,9 @@ water-shading: 100
 # may also hide blocks like pistons, rails, chests, and other random blocks.
 default-render: true
 
+# This is whether the cursor will appear like a normal map
+show-player: true
+
 # This is the list of blocks that will NOT appear on the map ONLY when using the custom renderer.
 # They can be expressed in ids or material names.
 transparent-blocks:

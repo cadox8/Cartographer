@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import io.github.bananapuncher714.MapManager.CursorSelector;
 import io.github.bananapuncher714.map.ColorMixer;
 import io.github.bananapuncher714.map.CustomRenderer;
+import io.github.bananapuncher714.map.RealWorldCursor;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -22,6 +24,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -29,6 +33,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.map.MapCursor;
 import org.bukkit.map.MapPalette;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
@@ -44,16 +49,32 @@ public class CartographerMain extends JavaPlugin implements Listener {
 	private boolean done = true;
 	private boolean centerChunk = true;
 	private boolean defrend = true;
+	private boolean showPlayer = true;
 	private int mapLoadSpeed = 16;
+	private MapCursor.Type defPointer = MapCursor.Type.WHITE_POINTER;
 	private World w = Bukkit.getWorld( "world" );
 	private Color defc = new Color( 255, 0, 255 );
+	private MapManager mm = new MapManager( this );
 	
 	@Override
 	public void onEnable() {
 		saveDefaultConfig();
 		loadConfig();
-		Bukkit.getPluginManager().registerEvents( new MapManager( this ), this );
+		Bukkit.getPluginManager().registerEvents( mm, this );
 		Bukkit.getPluginManager().registerEvents( this, this );
+		
+		mm.registerCursorSelector( "none", new CursorSelector() {
+			@Override
+			public ArrayList< RealWorldCursor > getCursors( Player p ) {
+				ArrayList< RealWorldCursor > cursors = new ArrayList< RealWorldCursor >();
+				for ( Entity ent : p.getNearbyEntities( 10, 5, 10 ) ) {
+					if ( ent instanceof Monster ) {
+						cursors.add( new RealWorldCursor( ent.getLocation(), MapCursor.Type.RED_POINTER ) );
+					}
+				}
+				return cursors;
+			}
+		} );
 		
 		Bukkit.getScheduler().scheduleSyncRepeatingTask( this, new Runnable() {
 			int state = -1;
@@ -123,13 +144,18 @@ public class CartographerMain extends JavaPlugin implements Listener {
 		centerChunk = c.getBoolean( "center-chunk" );
 		waters = c.getInt( "water-shading" );
 		defrend = c.getBoolean( "default-render" );
-		colorfiles = new ArrayList< String >( c.getStringList( "presets" ) );
+		showPlayer = c.getBoolean( "show-player" );
+		loadPresetList();
 		int height = c.getInt( "map-height" );
 		int width = c.getInt( "map-width" );
 		map = new byte[ width ][ height ];
 		loadAllColors( true );
 		loadAllTransparentBlocks( true );
 		loadData();
+	}
+	
+	public void loadPresetList() {
+		colorfiles = new ArrayList< String >( getConfig().getStringList( "presets" ) );
 	}
 	
 	public void loadAllTransparentBlocks( boolean clear ) {
@@ -262,6 +288,7 @@ public class CartographerMain extends JavaPlugin implements Listener {
 			for ( Player pl : Bukkit.getOnlinePlayers() ) {
 				if ( pl.hasPermission( "cartographer.admin" ) ) pl.sendMessage( ChatColor.AQUA + "Reloading map..." );
 			}
+			loadPresetList();
 			loadAllColors( false );
 			loadAllTransparentBlocks( false );
 			done = false;
@@ -291,6 +318,26 @@ public class CartographerMain extends JavaPlugin implements Listener {
 	
 	public int getYLength() {
 		return map[ 0 ].length;
+	}
+	
+	public boolean showPlayer() {
+		return showPlayer;
+	}
+	
+	public void showPlayer( boolean showPlayer ) {
+		this.showPlayer = showPlayer;
+	}
+	
+	public MapCursor.Type getDefPointer() {
+		return defPointer;
+	}
+	
+	public void setDefPointer( MapCursor.Type defPointer ) {
+		this.defPointer = defPointer;
+	}
+	
+	public MapManager getMapManager() {
+		return mm;
 	}
 	
 	private void loadData() {

@@ -1,6 +1,10 @@
 package io.github.bananapuncher714;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import io.github.bananapuncher714.map.CustomRenderer;
+import io.github.bananapuncher714.map.RealWorldCursor;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,15 +16,29 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.server.MapInitializeEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.map.MapCursor;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.bukkit.map.MapView.Scale;
 
 public class MapManager implements Listener {
+	private static HashMap< String, CursorSelector > cursors = new HashMap< String, CursorSelector >();
 	CartographerMain plugin;
 	
 	public MapManager( CartographerMain m ) {
 		plugin = m;
+	}
+	
+	public interface CursorSelector {
+		ArrayList< RealWorldCursor > getCursors( Player p );
+	}
+	
+	public void registerCursorSelector( String permission, CursorSelector selector ) {
+		cursors.put( permission, selector );
+	}
+	
+	public static HashMap< String, CursorSelector > getCursorSelectors() {
+		return new HashMap< String, CursorSelector >( cursors );
 	}
 	
 	public MapView getMap( MapView map, boolean zoom ) {
@@ -50,7 +68,7 @@ public class MapManager implements Listener {
 			mv.setScale( Scale.CLOSEST );
 		}
 		// And add the custom renderer
-		mv.addRenderer( new CustomRenderer( true, plugin, mv.getScale() ) );
+		mv.addRenderer( new CustomRenderer( true, plugin, mv.getScale(), plugin.showPlayer(), plugin.getDefPointer() ) );
 		return mv;
 	}
 	
