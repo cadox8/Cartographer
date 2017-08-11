@@ -1,5 +1,6 @@
 package io.github.bananapuncher714;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -16,7 +17,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.server.MapInitializeEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.map.MapCursor;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.bukkit.map.MapView.Scale;
@@ -31,6 +31,10 @@ public class MapManager implements Listener {
 	
 	public interface CursorSelector {
 		ArrayList< RealWorldCursor > getCursors( Player p );
+	}
+	
+	public interface MapShader {
+		Color shadeLocation( Location location, Color color );
 	}
 	
 	public void registerCursorSelector( String permission, CursorSelector selector ) {
@@ -68,7 +72,7 @@ public class MapManager implements Listener {
 			mv.setScale( Scale.CLOSEST );
 		}
 		// And add the custom renderer
-		mv.addRenderer( new CustomRenderer( true, plugin, mv.getScale(), plugin.showPlayer(), plugin.getDefPointer() ) );
+		mv.addRenderer( new CustomRenderer( true, plugin, mv.getScale(), plugin.showPlayer(), plugin.getDefPointer(), plugin.getSelectorLoadDelay() ) );
 		return mv;
 	}
 	
