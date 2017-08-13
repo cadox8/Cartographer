@@ -13,6 +13,8 @@ map-width: 1538
 # and 16 is already pretty fast and slightly laggy. For maps larger than 12048, use 32 or 64 or something higher.
 map-load-speed: 16
 
+# This is how fast custom renderers will reload the CursorSelectors as specified by other plugins.
+# This is expressed in the amount of seconds before updating
 selector-load-delay: 0
 
 # This is whether the center of the map will be in the center of a chunk or your exact position

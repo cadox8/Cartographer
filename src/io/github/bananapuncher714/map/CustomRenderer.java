@@ -1,3 +1,8 @@
+/**
+ * The class that is directly responsible for drawing on the actual MapView
+ * 
+ * @author BananaPuncher714
+ */
 package io.github.bananapuncher714.map;
 
 import io.github.bananapuncher714.CartographerMain;
@@ -28,6 +33,22 @@ public class CustomRenderer extends MapRenderer {
 	int selectorDelay;
 	long lastUpdatedSelectors = System.currentTimeMillis();
 	
+	/**
+	 * Instantiates the CustomRenderer.
+	 * 
+	 * @param contextual
+	 * Whether this will be player specific.
+	 * @param p
+	 * The Cartographer plugin.
+	 * @param s
+	 * The scale of the map.
+	 * @param showPlayer
+	 * Whether the viewer will show up or not.
+	 * @param defPointer
+	 * The default Mapcursor.Type that the player will show up as
+	 * @param selectorDelay
+	 * The default delay in seconds that the CursorSelectors will be re-picked from MapManager's cache of CursorSelectors.
+	 */
 	public CustomRenderer( boolean contextual, CartographerMain p, Scale s, boolean showPlayer, MapCursor.Type defPointer, int selectorDelay ) {
 		super( contextual );
 		// Here the amount of blocks( size ) is determined on the scale
@@ -201,6 +222,14 @@ public class CustomRenderer extends MapRenderer {
 		return ( int ) ( ( ( degree + 371.25 ) % 360 ) / 22.5 );
 	}
 	
+	/**
+	 * Fills the entire map with 1 solid color
+	 * 
+	 * @param canvas
+	 * The MapCanvas to fill
+	 * @param c
+	 * The color to fill
+	 */
 	public void fillMap( MapCanvas canvas, Color c ) {
 		for ( int x = 0; x < 128; x++ ) {
 			for ( int z = 0; z < 128; z++ ) {
@@ -209,10 +238,27 @@ public class CustomRenderer extends MapRenderer {
 		}
 	}
 	
+	/**
+	 * Fills the entire canvas with 1 solid color
+	 * 
+	 * @param canvas
+	 * The canvas to fill
+	 * @param r
+	 * The red
+	 * @param g
+	 * The green
+	 * @param b
+	 * The blue
+	 */
 	public void fillMap( MapCanvas canvas, int r, int g, int b ) {
 		fillMap( canvas, new Color( r, g, b ) );
 	}
 	
+	/**
+	 * Loads all selectors again from MapManager's cache of CursorSelectors.
+	 * @param p
+	 * The player to test for permissions.
+	 */
 	public void loadSelectors( Player p ) {
 		HashMap< String, CursorSelector > cursorMap = MapManager.getCursorSelectors();
 		for ( String permission : cursorMap.keySet() ) {

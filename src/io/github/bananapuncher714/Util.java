@@ -1,3 +1,8 @@
+/**
+ * Handles simple tests like getting the highest distance at a location and getting the depth of water.
+ * 
+ * @author BananaPuncher714
+ */
 package io.github.bananapuncher714;
 
 import java.util.HashSet;
@@ -8,6 +13,14 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
 public class Util {
+	/**
+	 * Gets how deep the water is in blocks from a certain location.
+	 * 
+	 * @param l
+	 * The location to test at
+	 * @return
+	 * The amount of water blocks below the location including the location itself
+	 */
 	public static int getWaterDepth( Location l ) {
 		Block b = l.getBlock();
 		int depth = 1;
@@ -20,10 +33,28 @@ public class Util {
 		return depth;
 	}
 	
+	/**
+	 * Gets the highest block at a certain location
+	 * 
+	 * @param l
+	 * The location to get a block
+	 * @return
+	 * The highest block including transparent objects.
+	 */
 	public static Block getHighestBlockAt( Location l ) {
 		return getHighestBlockAt( l, new HashSet< Material >() );
 	}
 	
+	/**
+	 * Gets the highest block at a certain location while skipping certain materials.
+	 * 
+	 * @param loc
+	 * The location to get a block
+	 * @param skip
+	 * The set of materials to skip
+	 * @return
+	 * The highest block at a certain location without being in the set of transparent blocks.
+	 */
 	public static Block getHighestBlockAt( Location loc, HashSet< Material > skip ) {
 		skip.add( Material.AIR );
 		Location l = loc.clone();

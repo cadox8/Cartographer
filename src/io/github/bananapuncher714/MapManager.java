@@ -1,3 +1,9 @@
+/**
+ * Manages maps and CursorSelectors for the CustomRenderer to use
+ * 
+ *  @author BananaPuncher714
+ */
+
 package io.github.bananapuncher714;
 
 import java.awt.Color;
@@ -29,22 +35,74 @@ public class MapManager implements Listener {
 		plugin = m;
 	}
 	
+	/**
+	 * Returns a list of RealWorldCursors based on a player
+	 * 
+	 * @author BananaPuncher714
+	 */
 	public interface CursorSelector {
+		/**
+		 * Gets a list of RealWorldCursors based on a player
+		 * 
+		 * @param p
+		 * The player that is viewing the map
+		 * @return
+		 * A list of cursors to display on the map
+		 */
 		ArrayList< RealWorldCursor > getCursors( Player p );
 	}
 	
+	/**
+	 * Changes a color at a particular location when drawing the map
+	 * 
+	 * @author BananaPuncher714
+	 */
 	public interface MapShader {
+		/**
+		 * Shades a provided color at a particular location
+		 * 
+		 * @param location
+		 * The location to use when determining how to change the color
+		 * @param color
+		 * The color that would normally represent the location
+		 * @return
+		 * The new shaded color
+		 */
 		Color shadeLocation( Location location, Color color );
 	}
 	
+	/**
+	 * Registers a CursorSelector with a permission so certain people can see certain cursors on the map.
+	 * 
+	 * @param permission
+	 * The permission required to view the cursors
+	 * @param selector
+	 * The CursorSelector to register
+	 */
 	public void registerCursorSelector( String permission, CursorSelector selector ) {
 		cursors.put( permission, selector );
 	}
 	
+	/**
+	 * Gets the list of all registered CursorSelectors
+	 * 
+	 * @return
+	 * A hashmap of permissions and their respective CursorSelectors
+	 */
 	public static HashMap< String, CursorSelector > getCursorSelectors() {
 		return new HashMap< String, CursorSelector >( cursors );
 	}
 	
+	/**
+	 * Gets the new MapView with a CustomRenderer.
+	 * 
+	 * @param map
+	 * The previous MapView to edit
+	 * @param zoom
+	 * whether or not to zoom in on the map
+	 * @return
+	 * The new MapView
+	 */
 	public MapView getMap( MapView map, boolean zoom ) {
 		// Get mapview
 		MapView mv = map;
@@ -76,6 +134,16 @@ public class MapManager implements Listener {
 		return mv;
 	}
 	
+	/**
+	 * Gets the new MapView based on a map item
+	 * 
+	 * @param map
+	 * The ItemStack that is a map
+	 * @param zoom
+	 * Whether or not to zoom in
+	 * @return
+	 * The new edited MapView
+	 */
 	public MapView getMap( ItemStack map, boolean zoom ) {
 		// Get mapview
 		short d = map.getDurability();
@@ -83,6 +151,14 @@ public class MapManager implements Listener {
 		return getMap( mv, zoom );
 	}
 	
+	/**
+	 * Unused; Supposed to set the center of a player in a MapView.
+	 * 
+	 * @param p
+	 * The player viewing the map
+	 * @param mv
+	 * The MapView to center
+	 */
 	public void setCenter( Player p, MapView mv ) {
 		// Totally unnecessary, maybe?
 		int distance;

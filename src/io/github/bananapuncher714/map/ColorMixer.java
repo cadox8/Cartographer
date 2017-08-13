@@ -1,9 +1,19 @@
+/**
+ * Edits simple colors.
+ * 
+ * @author BananaPuncher714
+ */
 package io.github.bananapuncher714.map;
 
 import java.awt.Color;
 
 public class ColorMixer {
 	
+	/**
+	 * Tint types for tinting a color.
+	 * 
+	 * @author BananaPuncher714
+	 */
 	public enum Tint {
 		RED(),
 		GREEN(),
@@ -15,6 +25,16 @@ public class ColorMixer {
 		}
 	}
 	
+	/**
+	 * Brightens a given color for a percent; Negative values darken the color.
+	 * 
+	 * @param c
+	 * The color to brighten.
+	 * @param percent
+	 * The percentage to brighten; Must not exceed 100 percent.
+	 * @return
+	 * The new brightened color.
+	 */
 	public static Color brightenColor( Color c, int percent ) {
 		if ( percent == 0 ) return c;
 		int r = c.getRed();
@@ -32,6 +52,18 @@ public class ColorMixer {
 		return new Color( newr, newg, newb );
 	}
 
+	/**
+	 * Tints a given color with a certain color and percent.
+	 * 
+	 * @param type
+	 * The tint that will be applied.
+	 * @param c
+	 * The color to tint.
+	 * @param percent
+	 * The percentage to tint the given color; Must not exceed 100 percent.
+	 * @return
+	 * The newly tinted color.
+	 */
 	public static Color tintColor( Tint type, Color c, int percent) {
 		int r = c.getRed();
 		int g = c.getGreen();
