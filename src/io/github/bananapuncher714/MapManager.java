@@ -202,7 +202,7 @@ public class MapManager implements Listener {
 	public void onPlayerInteractEvent( PlayerInteractEvent e ) {
 		// Must change that for 1.8/1.11
 		Action a = e.getAction();
-		if ( e.getHand() != EquipmentSlot.HAND ) return;
+		if ( !ReflectionUtils.isMainHand( e ) ) return;
 		if ( !a.equals( Action.RIGHT_CLICK_BLOCK ) && !a.equals( Action.LEFT_CLICK_BLOCK ) && !a.equals( Action.RIGHT_CLICK_AIR ) && !a.equals( Action.LEFT_CLICK_AIR ) ) return;
 		if ( e.getPlayer().getInventory().getItemInHand().getType() != Material.MAP ) return;
 		Player p = e.getPlayer();
