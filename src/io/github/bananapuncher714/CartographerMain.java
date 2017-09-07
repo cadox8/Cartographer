@@ -8,7 +8,11 @@ package io.github.bananapuncher714;
 
 import java.awt.Color;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,12 +68,16 @@ public class CartographerMain extends JavaPlugin implements Listener {
 	private MapCursor.Type defPointer = MapCursor.Type.WHITE_POINTER;
 	private World w = Bukkit.getWorld( "world" );
 	private Color defc = new Color( 255, 0, 255 );
-	private MapManager mm = new MapManager( this );
+	private MapManager mm;
+	
+	private static CartographerMain main;
 	
 	@Override
 	public void onEnable() {
+		main = this;
 		saveDefaultConfig();
 		loadConfig();
+		mm = new MapManager( this );
 		Bukkit.getPluginManager().registerEvents( mm, this );
 		Bukkit.getPluginManager().registerEvents( this, this );
 		
@@ -147,6 +155,7 @@ public class CartographerMain extends JavaPlugin implements Listener {
 	@Override
 	public void onDisable() {
 		saveData();
+		if ( done ) saveMap();
 	}
 	
 	// Here begins a LOT of methods to load and save data from files...
@@ -350,7 +359,7 @@ public class CartographerMain extends JavaPlugin implements Listener {
 		x = datac.getInt( "x" );
 		y = datac.getInt( "y" );
 		w = Bukkit.getWorld( datac.getString( "world" ) );
-		done = false;
+		done = loadMap();
 	}
 	
 	private void saveData() {
@@ -364,6 +373,42 @@ public class CartographerMain extends JavaPlugin implements Listener {
 		} catch (IOException e) {
 			System.out.println( "There was an error while trying to save the data to file!" );
 		}
+	}
+	
+	private boolean loadMap() {
+		File mapFile = new File( getDataFolder(), "map.ser" );
+		if ( !mapFile.exists() ) {
+			getLogger().warning( "Map data not found! Reloading the map!" );
+			return false;
+		}
+		try {
+            FileInputStream fileIn = new FileInputStream( mapFile );
+            ObjectInputStream in = new ObjectInputStream( fileIn );
+            map = ( byte[][] ) in.readObject();
+            in.close();
+            fileIn.close();
+            getLogger().info( "A saved copy of the map was found!" );
+            return true;
+        }catch(IOException i) {
+            getLogger().warning( "There was an error while reading the map data on disk!" );
+            return false;
+        }catch(ClassNotFoundException c) {
+        	getLogger().severe( "'map.ser' is not a proper map file! Reloading the map!" );
+            return false;
+        }
+	}
+	
+	private void saveMap() {
+		try {
+            FileOutputStream fileOut = new FileOutputStream( new File( getDataFolder(), "map.ser" ) );
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject( map );
+            out.close();
+            fileOut.close();
+            getLogger().info( "Saved map successfully to 'map.ser'" );
+        }catch(IOException i) {
+            getLogger().warning( "There was an error while saving the map to disk!" );
+        }
 	}
 	
 	// Finally!! We get to move onto some more basic command stuff!
@@ -401,6 +446,16 @@ public class CartographerMain extends JavaPlugin implements Listener {
 	}
 	
 	// Here are a bunch of getters and setters for external plugin use
+	
+	/**
+	 * Fetches the main instance of this plugin
+	 * 
+	 * @return
+	 * The instance created by the plugin manager
+	 */
+	public static CartographerMain getMain() {
+		return main;
+	}
 	
 	/**
 	 * Gets the X value of the center of the map at the current time.
