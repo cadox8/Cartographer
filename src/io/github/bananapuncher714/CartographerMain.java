@@ -17,12 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import io.github.bananapuncher714.MapManager.CursorSelector;
 import io.github.bananapuncher714.MapManager.MapShader;
 import io.github.bananapuncher714.map.ColorMixer;
-import io.github.bananapuncher714.map.CustomRenderer;
-import io.github.bananapuncher714.map.RealWorldCursor;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -30,25 +26,18 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapCursor;
 import org.bukkit.map.MapPalette;
-import org.bukkit.map.MapRenderer;
-import org.bukkit.map.MapView;
-import org.bukkit.map.MapView.Scale;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class CartographerMain extends JavaPlugin implements Listener {
@@ -264,7 +253,7 @@ public class CartographerMain extends JavaPlugin implements Listener {
 		loadColors( getConfig(), clear );
 		new File( getDataFolder() + File.separator + "presets" + File.separator ).mkdirs();
 		for ( String name : colorfiles ) {
-			File colorConfig = new File( getDataFolder() + File.separator + "presets" + File.separator + name );
+			File colorConfig = new File( getDataFolder() + File.separator + "presets", name );
 			if ( !colorConfig.exists() ) {
 				getLogger().warning( "preset '" + name + "' does not exist! Some colors may be missing!" );
 				continue;
@@ -289,7 +278,7 @@ public class CartographerMain extends JavaPlugin implements Listener {
 	public boolean loadColors( FileConfiguration c, boolean clear ) {
 		if ( clear ) mapColors.clear();
 		if ( c.getConfigurationSection( "map-colors" ) == null ) return false;
-		for (String s : c.getConfigurationSection( "map-colors" ).getKeys( false ) ) {
+		for ( String s : c.getConfigurationSection( "map-colors" ).getKeys( false ) ) {
 			String[] split = c.getString( "map-colors." + s ).split( "\\D+" );
 			String[] matSplit = s.split( "," );
 			loadColor( matSplit, split );
@@ -309,12 +298,9 @@ public class CartographerMain extends JavaPlugin implements Listener {
 	 */
 	public void loadColor( Material m, byte data, Color c ) {
 		Material mat = m;
-		HashMap< Byte, Color > tempMap = ( HashMap< Byte, Color > ) mapColors.get( mat );
-		if ( tempMap == null ) {
-			tempMap = new HashMap<Byte, Color>();
-			mapColors.put( mat, tempMap );
-		}
+		HashMap< Byte, Color > tempMap = mapColors.containsKey( mat ) ? ( HashMap< Byte, Color > ) mapColors.get( mat ) : new HashMap< Byte, Color >();
 		tempMap.put( data , c );
+		mapColors.put( mat, tempMap );
 		return;
 	}
 	
@@ -338,16 +324,24 @@ public class CartographerMain extends JavaPlugin implements Listener {
 	
 	private boolean loadColor( String[] md, String[] rgb ) {
 		Material mat = Material.AIR;
+		boolean found = false;
 		try {
 			mat = Material.getMaterial( Integer.parseInt( md[ 0 ] ) );
+			found = true;
 		} catch ( Exception e ) {
+		}
+		if ( !found ) {
 			try {
 				mat = Material.getMaterial( md[ 0 ] );
 			} catch ( Exception e2 ) {
-				getLogger().warning( md[ 0 ] + " does not exist! Older version of Minecraft, perhaps?" );
-				return false;
 			}
 		}
+		
+		if ( mat == null ) {
+			getLogger().warning( md[ 0 ] + " does not exist! Older version of Minecraft, perhaps?" );
+			return false;
+		}
+		
 		loadColor( mat, Byte.parseByte( md[ 1 ] ), new Color( Integer.parseInt( rgb[ 0 ] ), Integer.parseInt( rgb[ 1 ] ), Integer.parseInt( rgb[ 2 ] ) ) );
 		return true;
 	}
@@ -371,7 +365,7 @@ public class CartographerMain extends JavaPlugin implements Listener {
 		try {
 			datac.save( data );
 		} catch (IOException e) {
-			System.out.println( "There was an error while trying to save the data to file!" );
+			getLogger().warning( "There was an error while trying to save the data to file!" );
 		}
 	}
 	
