@@ -1,6 +1,6 @@
 /target/
 /bin/
 /doc/
-/.project
-/.classpath
-/.gitignore
+.project
+.classpath
+.gitignore
