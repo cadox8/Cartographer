@@ -1,1 +1,6 @@
 /target/
+/bin/
+/doc/
+/.project
+/.classpath
+/.gitignore
