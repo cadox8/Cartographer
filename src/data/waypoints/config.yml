@@ -1,0 +1,9 @@
+maximum-waypoints: 5
+
+default:
+    discover-range: 10
+    # You can choose from HIDDEN, VISIBLE, or HIGHLIGHTED
+    discover-visibility: HIGHLIGHTED
+
+# This is whether or not to display the 'discovered waypoint' message
+show-discover-message: true

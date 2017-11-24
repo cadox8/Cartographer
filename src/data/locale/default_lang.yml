@@ -1,0 +1,211 @@
+# This is the default language file for Cartographer! If you mess up with this one,
+# delete it and it will regenerate.
+version: "3.0"
+
+# If you want to make your own language file, you must include the three lines below.
+# Your id is the internal name
+# name is the one that gets displayed to players
+# translate-color is whether or not to convert all '&' to the color symbol.
+# Note that Clip's PlaceholderAPI already does this, so
+# if the placeholderAPI is enabled, setting this to false doesn't do anything.
+id: "default"
+name: "&fDefault Locale"
+translate-color: true
+
+# And now here are the messages!
+# You may notice that some of them have %s
+# That means that it is going to be replace by something else.
+# These messages also include the name of the inventories and items in the inventories.
+# When creating your own locale file, you do not have to include all the messages, as
+# Cartographer will use the default locale's messages that yours does not contain.
+messages:
+    header: "&9%s> &7%s"
+    main:
+        name: "Cartographer"
+        command:
+            usage: "&cUsage: /cartographer <addimage|addoverlay|locale|open|npc>"
+            setmapcenter-usage: "&cYou must create a new map first with '&e/setmapcenter <&bname&e>&c'"
+            no-permission: "You do not have permission to run this command!"
+            addimage-usage: "&cUsage: /cartographer addimage <name> <url> [dither] [height] [width]"
+            addoverlay-usage: "&cUsage: /cartographer addoverlay <name> <url>"
+            must-be-player: "&cYou must be a player to run this command!"
+            disabled-module: "&cThis module is not enabled!"
+            config-reloaded: "The config has been reloaded!"
+        notification:
+            saving-image: "Saving image to disk..."
+            saved-image: "Image was saved successfully to disk!"
+            save-error: "&cThere was an error saving the image to disk!"
+            invalid-url: "Invalid URL!"
+            download-error: "There was an error while downloading an image!"
+            
+            reloading-map: "Reloading map &e%s&7(&e%s&7)..."
+            updates-disabled: "Updating the map &e%s&7(&e%s&7) has been disabled!"
+            map-centered: "The map &e%s&7(&e%s&7) has been centered around &e%s&7, &e%s&7."
+            map-rendering-started: "Started rendering map &e%s&7(&e%s&7)!"
+            done-rendering: "Map rendering finished for &e%s&7(&e%s&7)!"
+            
+            map-set: "Map set for &e%s&7(&e%s&7)!"
+            overlay-set: "Overlay set for &e%s&7(&e%s&7)!"
+            overlay-removed: "Overlay removed for &e%s&7(&e%s&7)!"
+            
+            no-map-found: "&cYou don't have an active map!"
+        inventory:
+            map-selector:
+                title: "&2&lMap Selector"
+                buttons:
+                    map: "&b&lMap Selection"
+                    overlay: "&a&lOverlay Selection"
+                    minimap: "&c&lMap Management"
+                    next-page: "&f&lNext Page"
+                    previous-page: "&f&lPrevious Page"
+                items:
+                    overlay-name: "&f&l%s"
+                    map-name: "&f&l%s"
+                    minimap-name: "&f&l%s"
+                    minimap-lore-1: "&f&lId: &e%s"
+                    minimap-lore-2: "&f&lWorld: &e%s"
+                    minimap-lore-3: "&7&lLeft-click&7 to set as your map"
+                    minimap-lore-4: "&7&lRight-click&7 to reload this map"
+                    none: "&f&lNone"
+    locale:
+        name: "Locale"
+        notification:
+            changed-locale: "You have changed your locale to &e%s&7!"
+        inventory:
+            locale-selector:
+                title: "&1&lSelect Your Locale"
+                buttons:
+                    next-page: "&f&lNext Page"
+                    previous-page: "&f&lPrevious Page"
+                items:
+                    name: "&f%s"
+    waypoints:
+        name: "Waypoints"
+        command:
+            no-permission: "You do not have permission to run this command!"
+            usage: "&cUsage: /waypoints [create|open]"
+            create-usage: "&cUsage: /waypoints create <name> [x] [z]"
+            must-be-player: "&cYou must be a player to run this command!"
+        notification:
+            too-many-waypoints: "You cannot have more than &e%s&7 waypoints!"
+            created-waypoint: "You have created waypoint '&e%s&7' successfully!"
+            deleted-waypoint: "You have removed '&e%s&7'"
+            discovered-waypoint: "You have discovered '&e%s&7'!"
+        map:
+            cursor:
+                hover: "\u00a734;%s"
+        inventory:
+            manager:
+                title: "&1&lWaypoints"
+                buttons:
+                    your-waypoints: "&e&lYour Waypoints"
+                    shared-waypoints: "&a&lShared Waypoints"
+                    discover-waypoints: "&e&lDiscovered Waypoints"
+                    public-waypoints: "&b&lPublic Waypoints"
+                    staff-waypoints: "&c&lStaff Waypoints"
+                    next-page: "&f&lNext Page"
+                    previous-page: "&f&lPrevious Page"
+                    unhide-all: "&a&lUnhide All"
+                items:
+                    private:
+                        # Yes, this 'line' business may seem suspicious, but
+                        # unfortunately not, it does not mean you can add/remove lines
+                        name: "&a%s"
+                        line-1: "&fVisibility: &e%s"
+                        line-2: "&fType: &e%s"
+                        line-3: "&fPublic: &e%s"
+                        line-4: "&fStaff: &e%s"
+                        line-5: "&fDiscoverable: &e%s"
+                        line-6: "&7&lLeft-click &7to change cursor type"
+                        line-7: "&7&lRight-click &7to change visibility"
+                        line-8: "&7&lMiddle-click &7to teleport"
+                        line-9: "&7&lShift left-click &7to edit waypoint"
+                    shared:
+                        name: "&a%s"
+                        line-1: "&fSet by &e%s"
+                        line-2: "&fType: &e%s"
+                        line-3: "&fX: &e%s"
+                        line-4: "&fZ: &e%s"
+                        line-5: "&fVisibility: &e%s"
+                        line-6: "&7&lLeft-click &7to change visibility"
+                        line-7: "&7&lRight-click &7to teleport"
+                        line-8: "&7&lShift left-click &7to edit waypoint"
+                    public:
+                        name: "&7%s"
+                        line-1: "&fSet by &e%s"
+                        line-2: "&fType: &e%s"
+                        line-3: "&fX: &e%s"
+                        line-4: "&fZ: &e%s"
+                        line-5: "&fVisibility: &e%s"
+                        line-6: "&7&lLeft-click &7to change visibility"
+                        line-7: "&7&lRight-click &7to teleport"
+                        line-8: "&7&lShift left-click &7to edit waypoint"
+            editor:
+                title: "&2&lEdit Waypoint"
+                items:
+                    waypoint:
+                        name: "&a%s"
+                        line-1: "&fCreated by &e%s"
+                    discover:
+                        name: "&b&lSet discover range"
+                        line-1: "&fEnabled: &e%s"
+                        line-2: "&fCurrent range: &e%s"
+                        line-3: "&7&lDrop &7to toggle discovery mode"
+                        line-4: "&7&lLeft click &7to decrease range(&c-1&7)"
+                        line-5: "&7&lShift-left click &7to decrease range(&c-5&7)"
+                        line-6: "&7&lRight click &7to increase range(&a+1&7)"
+                        line-7: "&7&lShift-right click &7to increase range(&a+5&7)"
+                    icon:
+                        name: "&b&lChange icon type"
+                        line-1: "&fCurrent Type: &e%s"
+                    visibility:
+                        name: "&b&lChange Visibility"
+                        line-1: "&fVisibility: &e%s"
+                    share:
+                        name: "&b&lShare"
+                        line-1: "&fShared with &e%s&f player(s)"
+                    delete:
+                        name: "&c&lDelete"
+                    teleport:
+                        name: "&a&lTeleport"
+                        line-1: "&fX: &e%s"
+                        line-2: "&fY: &e%s"
+                        line-3: "&fZ: &e%s"
+                    public:
+                        name: "&9&lToggle Public"
+                        line-1: "&fCurrent status: &e%s"
+                    staff:
+                        name: "&9&lToggle Staff"
+                        line-1: "&fCurrent status: &e%s"
+            share-waypoint:
+                title: "&2Select players to share with"
+                buttons:
+                    next-page: "&f&lNext Page"
+                    previous-page: "&f&lPrevious Page"
+                items:
+                    name: "&a%s"
+                    add: "&7Click to add"
+                    remove: "&7Click to remove"
+    citizens:
+        name: "Citizens"
+        map:
+            cursor:
+                hover: "\u00a718;%s"
+        inventory:
+            manager:
+                title: "&2&lEdit NPC Cursors"
+                buttons:
+                    next-page: "&f&lNext Page"
+                    previous-page: "&f&lPrevious Page"
+                items:
+                    npc:
+                        name: "&b%s"
+                        line-1: "&fCurrent icon: &e%s"
+                        line-2: "&fRange: &e%s"
+                        line-3: "&fHighlighted: &e%s"
+                        line-4: "&fVisible: &e%s"
+                        line-5: "&7&lLeft click &7to change the icon"
+                        line-6: "&7&lRight click &7to highlight/unhighlight"
+                        line-7: "&7&lPress Q &7to change visibility"
+                        line-8: "&7&lShift-left click &7to lower the range"
+                        line-9: "&7&lShift-right click &7to raise the range"

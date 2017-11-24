@@ -1,0 +1,54 @@
+#                                                                                   ,,                        
+#   .g8"""bgd                    mm                                               `7MM                        
+# .dP'     `M                    MM                                                 MM                        
+# dM'       ` ,6"Yb.  `7Mb,od8 mmMMmm ,pW"Wq.   .P"Ybmmm `7Mb,od8 ,6"Yb. `7MMpdMAo. MMpMMMb.  .gP"Ya `7Mb,od8 
+# MM         8)   MM    MM' "'   MM  6W'   `Wb :MI  I8     MM' "'8)   MM   MM   `Wb MM    MM ,M'   Yb  MM' "' 
+# MM.         ,pm9MM    MM       MM  8M     M8  WmmmP"     MM     ,pm9MM   MM    M8 MM    MM 8M""""""  MM     
+# `Mb.     ,'8M   MM    MM       MM  YA.   ,A9 8M          MM    8M   MM   MM   ,AP MM    MM YM.    ,  MM     
+#   `"bmmmd' `Moo9^Yo..JMML.     `Mbmo`Ybmd9'   YMMMMMb  .JMML.  `Moo9^Yo. MMbmmd'.JMML  JMML.`Mbmmd'.JMML.   
+#                                              6'     dP                   MM                                 
+#                                              Ybmmmd'                   .JMML.                               
+debug: false
+
+name: "&f&lDefault map"
+lore:
+- "&f&lScale:&e %MAP_SCALE%"
+- "&7&lRight-click &7to zoom out"
+- "&7&lLeft-click &7to zoom in"
+
+map:
+    height: 512
+    width: 512
+    updates: true
+    center-chunk: true
+    render-on-chunk-load: true
+    
+cursor:
+    enabled: true
+    type: WHITE_CROSS
+    radius: 3
+
+shading:
+    default-color: "255, 0, 255"
+    water-shading: 100
+    shade-height: -1
+    hide-if-hidden: true
+    show-highest: true
+
+misc:
+    show-player: true
+
+module:
+    waypoints: true
+    radar: true
+    display: true
+    kingdoms: true
+    factionsuuid: true
+    towny: true
+    worldguard: true
+    citizens: true
+    quests: true
+    worldborder: false
+
+presets:
+- 1.11.2.yml

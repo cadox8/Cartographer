@@ -11,6 +11,6 @@ transparent-blocks:
     - LOG_2
     
 map-colors:
-    DIAMOND_ORE,-1: "0, 255, 255"
-    GOLD_ORE,-1: "255, 255, 0"
-    EMERALD_ORE,-1: "0, 255, 0"
+    DIAMOND_ORE,0: "0, 255, 255"
+    GOLD_ORE,0: "255, 255, 0"
+    EMERALD_ORE,0: "0, 255, 0"

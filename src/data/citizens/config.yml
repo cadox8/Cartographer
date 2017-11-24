@@ -1,0 +1,5 @@
+default:
+    range: 10
+    icon: BLUE_POINTER
+    highlighted: false
+    visible: true
