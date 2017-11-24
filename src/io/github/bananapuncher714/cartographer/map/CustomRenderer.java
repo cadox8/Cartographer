@@ -27,10 +27,6 @@ public class CustomRenderer extends MapRenderer {
 	 * The Cartographer plugin.
 	 * @param s
 	 * The scale of the map.
-	 * @param showPlayer
-	 * Whether the viewer will show up or not.
-	 * @param defPointer
-	 * The default Mapcursor.Type that the player will show up as
 	 * @param selectorDelay
 	 * The default delay in seconds that the CursorSelectors will be re-picked from MapManager's cache of CursorSelectors.
 	 */

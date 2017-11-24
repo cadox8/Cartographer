@@ -11,6 +11,8 @@ public final class LocaleLoader {
 	 * 
 	 * @param directory
 	 * The directory to load them from
+	 * @return
+	 * The locales loaded from that directory
 	 */
 	public static Map< String, Locale > loadLocales( File directory ) {
 		return null;
